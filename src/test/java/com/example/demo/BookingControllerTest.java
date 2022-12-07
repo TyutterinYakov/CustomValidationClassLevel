@@ -3,6 +3,7 @@ package com.example.demo;
 import com.example.demo.controller.BookingController;
 import com.example.demo.dto.BookingDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,10 +18,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(BookingController.class)
 @AutoConfigureMockMvc
+@Slf4j
 public class BookingControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @Test
     void testCreateBookingStartEqualsEnd() throws Exception {
@@ -29,9 +34,10 @@ public class BookingControllerTest {
                 date,
                 date);
 
+        String body = objectMapper.writeValueAsString(bookingDto);
+        log.info(body);
         mockMvc.perform(post("/bookings")
-                        .content(String.format("{\"start\": \"%s\", \"end\":\"%s\"}",
-                                bookingDto.getStart(), bookingDto.getEnd()))
+                        .content(body)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
@@ -43,8 +49,7 @@ public class BookingControllerTest {
                 LocalDateTime.now().plusDays(2));
 
         mockMvc.perform(post("/bookings")
-                        .content(String.format("{\"start\": \"%s\", \"end\":\"%s\"}",
-                                bookingDto.getStart(), bookingDto.getEnd()))
+                        .content(objectMapper.writeValueAsString(bookingDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
@@ -56,8 +61,7 @@ public class BookingControllerTest {
                 null);
 
         mockMvc.perform(post("/bookings")
-                        .content(String.format("{\"start\": \"%s\", \"end\":\"%s\"}",
-                                bookingDto.getStart(), bookingDto.getEnd()))
+                        .content(objectMapper.writeValueAsString(bookingDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
