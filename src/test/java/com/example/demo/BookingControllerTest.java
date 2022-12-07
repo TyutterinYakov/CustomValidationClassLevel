@@ -22,19 +22,16 @@ public class BookingControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Test
     void testCreateBookingStartEqualsEnd() throws Exception {
         LocalDateTime date = LocalDateTime.now().plusDays(1);
         BookingDto bookingDto = new BookingDto(
                 date,
-                date,
-                "Hello");
+                date);
 
         mockMvc.perform(post("/bookings")
-                        .content(objectMapper.writeValueAsString(bookingDto))
+                        .content(String.format("{\"start\": \"%s\", \"end\":\"%s\"}",
+                                bookingDto.getStart(), bookingDto.getEnd()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
@@ -43,11 +40,24 @@ public class BookingControllerTest {
     void testCreateBookingStartAfterEnd() throws Exception {
         BookingDto bookingDto = new BookingDto(
                 LocalDateTime.now().plusDays(5),
-                LocalDateTime.now().plusDays(2),
-                "Hello");
+                LocalDateTime.now().plusDays(2));
 
         mockMvc.perform(post("/bookings")
-                        .content(objectMapper.writeValueAsString(bookingDto))
+                        .content(String.format("{\"start\": \"%s\", \"end\":\"%s\"}",
+                                bookingDto.getStart(), bookingDto.getEnd()))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void testCreateBookingStartEndIsNull() throws Exception {
+        BookingDto bookingDto = new BookingDto(
+                null,
+                null);
+
+        mockMvc.perform(post("/bookings")
+                        .content(String.format("{\"start\": \"%s\", \"end\":\"%s\"}",
+                                bookingDto.getStart(), bookingDto.getEnd()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }

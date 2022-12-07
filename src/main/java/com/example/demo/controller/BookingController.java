@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.BookingDto;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,7 +14,7 @@ public class BookingController {
 
 
     @PostMapping
-    public BookingDto create(@Valid BookingDto bookingDto) {
+    public BookingDto create(@RequestBody @Valid BookingDto bookingDto) {
         return bookingDto;
     }
 
